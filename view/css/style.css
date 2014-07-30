@@ -1,0 +1,39 @@
+#grid{
+  background:#676767;
+  width:450px;
+  height:450px;
+  padding:20px;
+}
+
+.row{
+  
+}
+
+.row:nth-child(odd){
+  
+}
+
+.row:nth-child(even){
+  margin-left:20px;
+}
+
+.row div.item{
+  margin-left:5px;
+  padding:0px;
+  display:inline-block;
+  width:40px;
+  height:40px;
+  background:#b5b5b5;
+  -moz-border-radius: 20px; 
+  -webkit-border-radius: 20px; 
+  border-radius: 20px; 
+}
+
+.row div.item.selected{
+  background-color:#ff845e;
+}
+
+.row div.item.hascat{
+  background-color: #fff;
+}
+
