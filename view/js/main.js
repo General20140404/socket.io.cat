@@ -90,14 +90,16 @@ function clearRunableSteps(stepArr) {
 }
 
 function getCatRunableSteps(catStandingElem, rows, columns) {
+    console.log(catStandingElem)
     var stepArr = [];
-    var countArr = [[-1,-1], [-1, 0], [0, -1], [0, 1], [1, -1], [1, 0]];
+    var countArrForOdd = [[-1,-1], [-1, 0], [0, -1], [0, 1], [1, -1], [1, 0]];
+    var countArrForEven = [[-1,0], [-1, 1], [0, -1], [0, 1], [1, 0], [1, 1]];
 
     var catCoord = catStandingElem.getAttribute("id").match(/\d/g);
     var coordX = parseInt(catCoord[0], 10),
-        coordY = x%2 ? parseInt(catCoord[1], 10) + 1 : parseInt(catCoord[1], 10);
+        coordY = parseInt(catCoord[1], 10);
 
-        console.log(coordX + "," + coordY)
+    var countArr = coordX%2 ? countArrForEven : countArrForOdd;
 
     for(var i = 0, len = countArr.length; i<len; i++) {
         var x = coordX + countArr[i][0];
@@ -107,11 +109,16 @@ function getCatRunableSteps(catStandingElem, rows, columns) {
             var runableElem = document.getElementById('grid-' + x + '-' + y);
 
             if(runableElem && !hasClass(runableElem, 'selected')) {
+                console.log(x + "," + y)
                 addClass(runableElem, 'runable');
                 stepArr.push(runableElem);
             }
+
+
         }
     }
+
+    console.log("--------------------------")
 
     return stepArr;
 }
