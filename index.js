@@ -91,18 +91,7 @@ io.on('connection', function(socket) {
 
     });
 
-	// for the first time connect
-	// socket.emit('connected', {hello: 'hello world!'});
-
-	// get message from client side
-	// socket.on('message', function(msg) {
-	// 	console.log('received message from ' + socket.id + ': ' + msg);
-	// });
-
-	// for the disconnect
-	// socket.on('disconnect', function() {
-	// 	console.log('connection ' + socket.id + 'terminated.');
-	// });
+	
 });
 
 function initRandomGrid(rows, columns, randomNum) {
