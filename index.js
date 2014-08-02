@@ -1,3 +1,9 @@
+var GRID_ROWS = 9,
+    GRID_COLUMNS = 9,
+    INIT_RANDOM_NUM = 15;
+
+var randomGridArr = initRandomGrid(GRID_ROWS, GRID_COLUMNS, INIT_RANDOM_NUM);
+
 var http = require('http'),
     url = require('url'),
     fs = require('fs'),
@@ -59,7 +65,12 @@ var io = require('socket.io').listen(server);
 io.on('connection', function(socket) {
 	console.log('connection ' + socket.id + ' successful!');
 
-    socket.emit('open');
+    socket.emit('open', {
+        row : GRID_ROWS,
+        column :GRID_COLUMNS,
+        randomNum :INIT_RANDOM_NUM,
+        randomGridArr : randomGridArr
+    });
 
     // 构造客户端对象
     var client = {
@@ -67,8 +78,13 @@ io.on('connection', function(socket) {
         name:false
     }
 
-    socket.on('message', function(msg) {
-        socket.emit('message',msg);
+    // socket.on('message', function(msg) {
+    //     // socket.emit('message',msg);
+    //     socket.emit('message', msg)
+    // });
+
+    socket.on('run', function(data) {
+        socket.broadcast.emit('run', data);
     });
 
     socket.on('disconnect', function(msg) {
@@ -88,3 +104,13 @@ io.on('connection', function(socket) {
 	// 	console.log('connection ' + socket.id + 'terminated.');
 	// });
 });
+
+function initRandomGrid(rows, columns, randomNum) {
+    var randomArr = [];
+    for(var i = 0; i<randomNum; i++) {
+        var r = [Math.floor(Math.random() * rows), Math.floor(Math.random() * columns)];
+        randomArr.push(r);
+    }
+
+    return randomArr;
+}
