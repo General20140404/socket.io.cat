@@ -19,6 +19,10 @@ body{
     margin:auto;
 }
 
+.forbid{
+    cursor: not-allowed;
+}
+
 .title{
     height: 40px;
     font-size: 28px;
@@ -44,6 +48,10 @@ body{
 
 .playInfo.people{
     float: right;
+}
+
+.playInfo.turn{
+    color: #ff845e;
 }
 
 .row{

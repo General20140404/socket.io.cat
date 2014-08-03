@@ -91,8 +91,6 @@ io.on('connection', function(socket) {
         
         if(waitingClient.length === 2){
             var room = new Room(waitingClient[0], waitingClient[1]);
-
-            console.log(1111)
             // io.sockets.emit('startGame', room);
             // socket.broadcast.to(waitingClient[0].socketId).emit('startGame', room);
             // socket.broadcast.to(waitingClient[1].socketId).emit('startGame', room);

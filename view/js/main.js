@@ -3,14 +3,17 @@ var GRID_ROWS,
     GRID_COLUMNS,
     INIT_RANDOM_NUM,
     randomGridArr,
-    CLIENT_INFO;
+    CLIENT_INFO,
+    ROOM_INFO;
 
-var catRunFlag = false,
+var runTurn = 'people',
     catStandingElem,
     catRunableElems = [];
 
 var gridWrapper = document.getElementById("grid"),
     headerElem = document.getElementById("header"),
+    catInfoElem = null,
+    peopleInfoElem = null,
     dialogElem = document.getElementById("dialog"),
     maskElem = document.getElementById("mask");
 
@@ -19,11 +22,9 @@ var gridWrapper = document.getElementById("grid"),
 var socket = (function() {
     var socket = io.connect('http://localhost');
 
-    socket.on('open',function(data){
-        console.log(data)
+    socket.on('open',function(data) {
 
         CLIENT_INFO = data.client;
-
         GRID_ROWS = data.row;
         GRID_COLUMNS = data.column;
         drawGrid(GRID_ROWS, GRID_COLUMNS);
@@ -43,64 +44,69 @@ var socket = (function() {
 
     socket.on('startGame', function(room) {
 
+        ROOM_INFO = room;
+
         addClass(maskElem, 'hide');
 
-        displayClientInfo(room.members);
+        displayClientInfo(room.members, runTurn);
         randomGridArr = room.randomGridArr;
         catStandingElem = initGrid(GRID_ROWS, GRID_COLUMNS, randomGridArr);
-        
+
+        if(CLIENT_INFO.socketId !== room.members[room.turn].socketId) {
+            addClass(gridWrapper, 'forbid');
+        }
 
         gridWrapper.addEventListener('click', function(event) {
             var target = event.target;
-            if(hasClass(target, 'item')) {
+            if(hasClass(target, 'item') && !hasClass(gridWrapper, 'forbid')) {
                 //人走
-                if(!hasClass(target, 'hascat') && !hasClass(target, 'selected') && !catRunFlag) {
+                if(!hasClass(target, 'hascat') && !hasClass(target, 'selected') && runTurn === 'people') {
+
                     addClass(target, 'selected');
                     catRunableElems = getCatRunableSteps(catStandingElem, GRID_ROWS, GRID_COLUMNS);
-                    var sendObj = {
-                        runElem : target.id,
-                        catRunFlag : catRunFlag
-                    };
-                    
-                    socket.emit("run", sendObj);
-                    catRunFlag = true;
                 }
 
                 //猫走
-                if(hasClass(target, 'runable') && catRunFlag) {
+                if(hasClass(target, 'runable') && runTurn === 'cat') {
                     removeClass(catStandingElem, 'hascat');
                     clearRunableSteps(catRunableElems);
                     catStandingElem = target;
                     addClass(target, 'hascat');
-                    var sendObj = {
-                        runElem : target.id,
-                        catRunFlag : catRunFlag
-                    };
-
-                    socket.emit("run", sendObj);
-                    catRunFlag = false;
                 }
+
+                var sendObj = {
+                    runElem : target.id,
+                    turn : runTurn
+                }
+
+                socket.emit("run", sendObj);
+                toggleTurn();
+
             }
 
         });
     });
 
-    socket.on('run', function(data){
+    socket.on('run', function(data) {
+
         console.log(data)
 
         var elem = document.getElementById(data.runElem);
-        if(data.catRunFlag && hasClass(elem, 'hascat')){
+
+        if(data.turn === 'people') {
+            addClass(elem, 'selected');
+            catRunableElems = getCatRunableSteps(catStandingElem, GRID_ROWS, GRID_COLUMNS);
+        }
+
+        if(data.turn === 'cat') {
             removeClass(catStandingElem, 'hascat');
             clearRunableSteps(catRunableElems);
             catStandingElem = elem;
             addClass(elem, 'hascat');
         }
 
-        if(!data.catRunFlag && !hasClass(elem, 'selected')){
-
-            addClass(elem, 'selected');
-            catRunableElems = getCatRunableSteps(catStandingElem, GRID_ROWS, GRID_COLUMNS);
-        }
+        toggleTurn();
+        
     });
     
 })();
@@ -108,7 +114,6 @@ var socket = (function() {
 function drawGrid(rows, columns) {
 
     var gridWrapper = document.getElementById('grid');
-
     var rowTemplate = '<div class="row">{items}</div>';
     var itemTemplate = '<div id="grid-{row}-{column}" class="item"></div>';
     var gridHtml = '';
@@ -122,18 +127,19 @@ function drawGrid(rows, columns) {
     }
 
     gridWrapper.innerHTML = gridHtml;
-
-    return gridWrapper;
-  
 }
 
-function displayClientInfo(member){
-    var template = '<div class="playInfo cat">Cat : {catName}</div><div class="playInfo people">People : {peopleName}</div>';
+function displayClientInfo(member, turn){
+    var template = '<div id="cat" class="playInfo cat">Cat : {catName}</div><div id="people" class="playInfo people">People : {peopleName}</div>';
     template = template.replace('{catName}', member.cat.name);
     template = template.replace('{peopleName}', member.people.name);
     headerElem.innerHTML = template;
+    
+    var turnElem = document.getElementById(turn);
+    addClass(turnElem, 'turn');
 
-    return headerElem;
+    catInfoElem = document.getElementById('cat');
+    peopleInfoElem = document.getElementById('people');
 }
 
 function initGrid(rows, columns, randomGridArr) {
@@ -151,6 +157,27 @@ function initGrid(rows, columns, randomGridArr) {
     } 
 
     return initCatItem;
+}
+
+function toggleTurn() {
+    runTurn = runTurn === 'people' ? 'cat' : 'people';
+
+    console.log(catInfoElem)
+    console.log(peopleInfoElem)
+
+    if(runTurn === 'people') {
+        removeClass(catInfoElem, 'turn');
+        addClass(peopleInfoElem, 'turn');
+    }else{
+        removeClass(peopleInfoElem, 'turn');
+        addClass(catInfoElem, 'turn');
+    }
+
+    if(CLIENT_INFO.socketId !== ROOM_INFO.members[runTurn].socketId) {
+        addClass(gridWrapper, 'forbid');
+    }else{
+        removeClass(gridWrapper,'forbid');
+    }
 }
 
 function clearRunableSteps(stepArr) {
