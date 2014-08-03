@@ -1,10 +1,14 @@
+body{
+    font: 14px Helvetica,Arial,sans-serif;
+}
+
 .hide{
     display: none;
 }
 
-#grid{
+.warpper{
     background:#676767;
-    width:450px;
+    width:435px;
     height:450px;
     padding:20px;
     position: absolute;
@@ -13,7 +17,33 @@
     right:0px;
     left:0px;
     margin:auto;
+}
 
+.title{
+    height: 40px;
+    font-size: 28px;
+    text-align: center;
+    color: #ccc;
+    font-weight: bold;
+
+}
+
+#header{
+    height: 30px;
+}
+
+.playInfo{
+    font-size: 20px;
+    color: #fff;
+    font-weight: bold;
+}
+
+.playInfo.cat{
+    float: left;
+}
+
+.playInfo.people{
+    float: right;
 }
 
 .row{

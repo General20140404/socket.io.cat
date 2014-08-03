@@ -129,7 +129,7 @@ function Room(client1, client2) {
     this.roomId = new Date().getTime();
     this.members = {
         cat : client1,
-        poeple : client2
+        people : client2
     };
     this.randomGridArr = [];
 

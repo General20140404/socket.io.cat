@@ -10,6 +10,7 @@ var catRunFlag = false,
     catRunableElems = [];
 
 var gridWrapper = document.getElementById("grid"),
+    headerElem = document.getElementById("header"),
     dialogElem = document.getElementById("dialog"),
     maskElem = document.getElementById("mask");
 
@@ -25,7 +26,6 @@ var socket = (function() {
 
         GRID_ROWS = data.row;
         GRID_COLUMNS = data.column;
-        
         drawGrid(GRID_ROWS, GRID_COLUMNS);
 
 
@@ -45,8 +45,10 @@ var socket = (function() {
 
         addClass(maskElem, 'hide');
 
+        displayClientInfo(room.members);
         randomGridArr = room.randomGridArr;
         catStandingElem = initGrid(GRID_ROWS, GRID_COLUMNS, randomGridArr);
+        
 
         gridWrapper.addEventListener('click', function(event) {
             var target = event.target;
@@ -123,6 +125,15 @@ function drawGrid(rows, columns) {
 
     return gridWrapper;
   
+}
+
+function displayClientInfo(member){
+    var template = '<div class="playInfo cat">Cat : {catName}</div><div class="playInfo people">People : {peopleName}</div>';
+    template = template.replace('{catName}', member.cat.name);
+    template = template.replace('{peopleName}', member.people.name);
+    headerElem.innerHTML = template;
+
+    return headerElem;
 }
 
 function initGrid(rows, columns, randomGridArr) {
