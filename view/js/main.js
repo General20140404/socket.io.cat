@@ -2,35 +2,54 @@
 var GRID_ROWS,
     GRID_COLUMNS,
     INIT_RANDOM_NUM,
-    randomGridArr;
+    randomGridArr,
+    CLIENT_INFO;
 
 var catRunFlag = false,
-    gridWrapper,
     catStandingElem,
     catRunableElems = [];
+
+var gridWrapper = document.getElementById("grid"),
+    dialogElem = document.getElementById("dialog"),
+    maskElem = document.getElementById("mask");
 
 
 
 var socket = (function() {
     var socket = io.connect('http://localhost');
 
-    // socket.on('connected', function() {
-    //     console.log('connected');
-    // });
-
     socket.on('open',function(data){
+        console.log(data)
+
+        CLIENT_INFO = data.client;
 
         GRID_ROWS = data.row;
         GRID_COLUMNS = data.column;
-        INIT_RANDOM_NUM = data.randomNum;
-        randomGridArr = data.randomGridArr;
+        
+        drawGrid(GRID_ROWS, GRID_COLUMNS);
 
-        gridWrapper = drawGrid(GRID_ROWS, GRID_COLUMNS);
+
+        var submitNameBtn = document.getElementById("nameSubmit");
+
+        submitNameBtn.addEventListener('click', function(event) {
+            var nameEle = document.getElementById("clientName");
+            if(nameEle.value !== "" ){
+                CLIENT_INFO.name = nameEle.value;
+                socket.emit('createClient', CLIENT_INFO);
+                addClass(dialogElem, "hide");
+            }
+        });
+    });
+
+    socket.on('startGame', function(room) {
+
+        addClass(maskElem, 'hide');
+
+        randomGridArr = room.randomGridArr;
         catStandingElem = initGrid(GRID_ROWS, GRID_COLUMNS, randomGridArr);
 
         gridWrapper.addEventListener('click', function(event) {
             var target = event.target;
-
             if(hasClass(target, 'item')) {
                 //人走
                 if(!hasClass(target, 'hascat') && !hasClass(target, 'selected') && !catRunFlag) {
@@ -42,7 +61,6 @@ var socket = (function() {
                     };
                     
                     socket.emit("run", sendObj);
-
                     catRunFlag = true;
                 }
 
@@ -52,14 +70,12 @@ var socket = (function() {
                     clearRunableSteps(catRunableElems);
                     catStandingElem = target;
                     addClass(target, 'hascat');
-
                     var sendObj = {
                         runElem : target.id,
                         catRunFlag : catRunFlag
                     };
 
                     socket.emit("run", sendObj);
-                    
                     catRunFlag = false;
                 }
             }
@@ -84,9 +100,6 @@ var socket = (function() {
             catRunableElems = getCatRunableSteps(catStandingElem, GRID_ROWS, GRID_COLUMNS);
         }
     });
-
-    
-
     
 })();
 

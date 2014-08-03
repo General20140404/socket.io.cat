@@ -62,26 +62,47 @@ var server = http.createServer(function(req, res) {
 
 
 var io = require('socket.io').listen(server);
+var waitingClient = [];
+var allRooms = [];
+var allSocket = {};
+
 io.on('connection', function(socket) {
 	console.log('connection ' + socket.id + ' successful!');
 
-    socket.emit('open', {
-        row : GRID_ROWS,
-        column :GRID_COLUMNS,
-        randomNum :INIT_RANDOM_NUM,
-        randomGridArr : randomGridArr
-    });
+    allSocket[socket.id] = socket;
 
     // 构造客户端对象
     var client = {
-        socket:socket,
+        socketId:socket.id,
         name:false
     }
 
-    // socket.on('message', function(msg) {
-    //     // socket.emit('message',msg);
-    //     socket.emit('message', msg)
-    // });
+    socket.emit('open', {
+        client : client,
+        row : GRID_ROWS,
+        column :GRID_COLUMNS
+    });
+
+    socket.on('createClient', function(clientInfo) {
+        waitingClient.push(clientInfo);
+
+        console.log(clientInfo.name)
+        console.log("waitingClient: " + waitingClient.length)
+        
+        if(waitingClient.length === 2){
+            var room = new Room(waitingClient[0], waitingClient[1]);
+
+            console.log(1111)
+            // io.sockets.emit('startGame', room);
+            // socket.broadcast.to(waitingClient[0].socketId).emit('startGame', room);
+            // socket.broadcast.to(waitingClient[1].socketId).emit('startGame', room);
+            allSocket[waitingClient[0].socketId].emit('startGame', room);
+            allSocket[waitingClient[1].socketId].emit('startGame', room);
+
+            allRooms.push(room);
+            waitingClient = [];
+        }
+    });
 
     socket.on('run', function(data) {
         socket.broadcast.emit('run', data);
@@ -103,3 +124,29 @@ function initRandomGrid(rows, columns, randomNum) {
 
     return randomArr;
 }
+
+function Room(client1, client2) {
+    this.roomId = new Date().getTime();
+    this.members = {
+        cat : client1,
+        poeple : client2
+    };
+    this.randomGridArr = [];
+
+    this.initRandomGrid();
+}
+
+Room.prototype.initRandomGrid = function() {
+    var rows = GRID_ROWS, 
+        columns = GRID_COLUMNS, 
+        randomNum = INIT_RANDOM_NUM,
+        randomArr = [];
+
+    for(var i = 0; i<randomNum; i++) {
+        var r = [Math.floor(Math.random() * rows), Math.floor(Math.random() * columns)];
+        randomArr.push(r);
+    }
+
+    this.randomGridArr = randomArr;
+    return randomArr;
+};

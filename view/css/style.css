@@ -1,8 +1,19 @@
+.hide{
+    display: none;
+}
+
 #grid{
-  background:#676767;
-  width:450px;
-  height:450px;
-  padding:20px;
+    background:#676767;
+    width:450px;
+    height:450px;
+    padding:20px;
+    position: absolute;
+    top:0px;
+    bottom:0px;
+    right:0px;
+    left:0px;
+    margin:auto;
+
 }
 
 .row{
@@ -14,27 +25,61 @@
 }
 
 .row:nth-child(even){
-  margin-left:20px;
+    margin-left:20px;
 }
 
 .row div.item{
-  margin-left:5px;
-  padding:0px;
-  display:inline-block;
-  width:40px;
-  height:40px;
-  background:#b5b5b5;
-  -moz-border-radius: 20px; 
-  -webkit-border-radius: 20px; 
-  border-radius: 20px; 
+    margin-left:5px;
+    padding:0px;
+    display:inline-block;
+    width:40px;
+    height:40px;
+    background:#b5b5b5;
+    -moz-border-radius: 20px; 
+    -webkit-border-radius: 20px; 
+    border-radius: 20px; 
 }
 
 .row div.item.selected{
-  background-color:#ff845e;
+    background-color:#ff845e;
 }
 
 .row div.item.hascat{
-  background-color: #fff;
+    background-color: #fff;
+}
+
+#mask{
+    position: fixed;
+    top: 0;
+    left: 0;
+    right: 0;
+    bottom: 0;
+    z-index: 1000;
+    background-color: #000000;
+    opacity: 0.5;
+}
+
+#dialog{
+    position: absolute;
+    width: 450px;
+    height: 200px;
+    background-color: #ffffff;
+    top:0px;
+    bottom:0px;
+    right:0px;
+    left:0px;
+    margin:auto;
+    z-index: 1040;
+    border-radius: 6px;
+}
+
+.dialog-header, .dialog-content, .dialog-footer{
+    padding:5px 20px;
+}
+
+.dialog-header{
+    line-height: 36px;
+    border-bottom: 1px solid #ccc;
 }
 
 
