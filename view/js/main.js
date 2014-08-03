@@ -81,7 +81,7 @@ var socket = (function() {
 
                 socket.emit("run", sendObj);
                 toggleTurn();
-
+                
             }
 
         });
@@ -130,7 +130,7 @@ function drawGrid(rows, columns) {
 }
 
 function displayClientInfo(member, turn){
-    var template = '<div id="cat" class="playInfo cat">Cat : {catName}</div><div id="people" class="playInfo people">People : {peopleName}</div>';
+    var template = '<div id="cat" class="playInfo cat">Cat : {catName}</div><div id="people" class="playInfo people">Catcher : {peopleName}</div>';
     template = template.replace('{catName}', member.cat.name);
     template = template.replace('{peopleName}', member.people.name);
     headerElem.innerHTML = template;

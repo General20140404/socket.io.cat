@@ -84,6 +84,7 @@ body{
 
 .row div.item.hascat{
     background-color: #fff;
+    background-image: url(../image/cat0.jpg);
 }
 
 #mask{
