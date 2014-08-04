@@ -20,7 +20,7 @@ var gridWrapper = document.getElementById("grid"),
 
 
 var socket = (function() {
-    var socket = io.connect('http://localhost');
+    var socket = io.connect('http://192.168.68.28');
 
     socket.on('open',function(data) {
 
@@ -78,6 +78,7 @@ var socket = (function() {
                 }
 
                 var sendObj = {
+                    room : ROOM_INFO,
                     runElem : target.id,
                     turn : runTurn
                 }

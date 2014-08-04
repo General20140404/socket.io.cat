@@ -1,6 +1,6 @@
 var GRID_ROWS = 9,
     GRID_COLUMNS = 9,
-    INIT_RANDOM_NUM = 15;
+    INIT_RANDOM_NUM = 10;
 
 var randomGridArr = initRandomGrid(GRID_ROWS, GRID_COLUMNS, INIT_RANDOM_NUM);
 
@@ -87,7 +87,6 @@ io.on('connection', function(socket) {
         waitingClient.push(clientInfo);
 
         console.log(clientInfo.name)
-        console.log("waitingClient: " + waitingClient.length)
         
         if(waitingClient.length === 2){
             var room = new Room(waitingClient[0], waitingClient[1]);
@@ -101,7 +100,11 @@ io.on('connection', function(socket) {
     });
 
     socket.on('run', function(data) {
-        socket.broadcast.emit('run', data);
+        var room = data.room;
+        var turn = data.turn === 'cat' ? 'people' : 'cat';
+        console.log(room.members[turn].socketId)
+        allSocket[room.members[turn].socketId].emit('run', data);
+        // socket.broadcast.emit('run', data);
     });
 
     socket.on('disconnect', function(msg) {
