@@ -20,7 +20,7 @@ var gridWrapper = document.getElementById("grid"),
 
 
 var socket = (function() {
-    var socket = io.connect('http://192.168.68.28');
+    var socket = io.connect('http://localhost');
 
     socket.on('open',function(data) {
 

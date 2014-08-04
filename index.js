@@ -1,6 +1,6 @@
 var GRID_ROWS = 9,
     GRID_COLUMNS = 9,
-    INIT_RANDOM_NUM = 10;
+    INIT_RANDOM_NUM = 13;
 
 var randomGridArr = initRandomGrid(GRID_ROWS, GRID_COLUMNS, INIT_RANDOM_NUM);
 
@@ -65,11 +65,12 @@ var io = require('socket.io').listen(server);
 var waitingClient = [];
 var allRooms = [];
 var allSocket = {};
+var allClientInfo = {};
 
 io.on('connection', function(socket) {
 	console.log('connection ' + socket.id + ' successful!');
 
-    allSocket[socket.id] = socket;
+    
 
     // 构造客户端对象
     var client = {
@@ -84,13 +85,17 @@ io.on('connection', function(socket) {
     });
 
     socket.on('createClient', function(clientInfo) {
+        allSocket[socket.id] = socket;
+        allClientInfo[socket.id] = clientInfo;
+
         waitingClient.push(clientInfo);
 
         console.log(clientInfo.name)
         
         if(waitingClient.length === 2){
             var room = new Room(waitingClient[0], waitingClient[1]);
-            
+
+            allClientInfo[waitingClient[0].socketId].room = allClientInfo[waitingClient[1].socketId].room = room;
             allSocket[waitingClient[0].socketId].emit('startGame', room);
             allSocket[waitingClient[1].socketId].emit('startGame', room);
 
@@ -107,8 +112,10 @@ io.on('connection', function(socket) {
         // socket.broadcast.emit('run', data);
     });
 
-    socket.on('disconnect', function(msg) {
+    socket.on('disconnect', function() {
+        console.log(socket.id)
 
+        // var room = allClientInfo[socket.id].room;
     });
 
 	
@@ -125,7 +132,7 @@ function initRandomGrid(rows, columns, randomNum) {
 }
 
 function Room(client1, client2) {
-    this.roomId = new Date().getTime();
+    this.roomId = client1.socketId + client2.socketId;
     this.members = {
         cat : client1,
         people : client2
