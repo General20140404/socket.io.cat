@@ -49,12 +49,15 @@ var socket = (function() {
         addClass(maskElem, 'hide');
 
         displayClientInfo(room.members, runTurn);
-        randomGridArr = room.randomGridArr;
-        catStandingElem = initGrid(GRID_ROWS, GRID_COLUMNS, randomGridArr);
 
-        if(CLIENT_INFO.socketId !== room.members[room.turn].socketId) {
+        randomGridArr = room.randomGridArr;
+
+        catStandingElem = initGrid(GRID_ROWS, GRID_COLUMNS, randomGridArr);
+        if(CLIENT_INFO.socketId !== room.members[runTurn].socketId) {
             addClass(gridWrapper, 'forbid');
         }
+
+
 
         gridWrapper.addEventListener('click', function(event) {
             var target = event.target;
